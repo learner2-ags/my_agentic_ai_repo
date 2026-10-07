@@ -1,0 +1,15 @@
+{
+  "issue_key": "HPELAB-102",
+  "phase": "engineering_loop",
+  "iteration": 0,
+  "goal": "Reject read-only SerialNumber on PATCH with Redfish-style 400 error",
+  "last_observation": null,
+  "verifiers": {
+    "targeted_playwright": "not_run",
+    "pytest": "not_run",
+    "playwright_full": "not_run",
+    "ci": "not_run"
+  },
+  "stop_condition": "not_met",
+  "escalation": null
+}

@@ -1,0 +1,27 @@
+name: Deploy Lab
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: lab
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build image
+        run: docker build -t hpe-redfish-agentic-lab:approved .
+      - name: Start approved lab deployment
+        run: docker run -d --name redfish-lab -p 8000:8000 hpe-redfish-agentic-lab:approved
+      - name: Wait for health endpoint
+        run: |
+          for i in {1..20}; do
+            curl -fsS http://127.0.0.1:8000/health && exit 0
+            sleep 1
+          done
+          docker logs redfish-lab
+          exit 1
+      - name: Deployment smoke test
+        run: |
+          curl -fsS http://127.0.0.1:8000/redfish/v1
+          curl -fsS http://127.0.0.1:8000/redfish/v1/Systems/1

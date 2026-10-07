@@ -1,0 +1,64 @@
+name: hpe-agentic-sdlc-loop
+version: 1
+
+# Teaching contract for the Jira -> coding-agent -> verifier -> HITL loop.
+trigger:
+  system: jira
+  when: "issue is Bug/Story and status or label indicates agent-ready"
+
+goal:
+  source_of_truth: jira_acceptance_criteria
+  success: "all acceptance criteria are mapped to code/tests, required tests are green, a draft PR is open, and evidence is recorded"
+
+context:
+  include:
+    - jira_summary_description_acceptance_criteria
+    - repository_instructions
+    - relevant_source_and_test_files
+    - prior_iteration_state
+
+tools:
+  allowed:
+    - jira_atlassian
+    - github
+    - filesystem
+    - terminal
+    - pytest
+    - playwright
+
+verification:
+  bug_rule: "create and demonstrate a failing Playwright regression test before modifying application code"
+  commands:
+    - "pytest -q"
+    - "npm run test:playwright"
+  independent_verifier: github_actions_ci
+
+iteration:
+  on_failure: "feed test/CI observation back to the agent; diagnose, adjust and rerun"
+  max_engineering_iterations: 5
+
+stop_conditions:
+  success:
+    - acceptance_criteria_satisfied
+    - targeted_and_full_tests_green
+    - draft_pr_open
+    - evidence_written_back
+  escalate:
+    - missing_or_contradictory_acceptance_criteria
+    - security_or_permission_boundary
+    - max_iterations_exceeded
+    - unsafe_or_destructive_action_requested
+
+hitl:
+  mandatory:
+    - pull_request_approval_and_merge
+    - release_deployment_approval
+  optional_teaching_gate:
+    - initial_plan_approval
+
+state:
+  teaching_file: loop/state.json
+  durable_systems:
+    - jira_audit_trail
+    - github_pull_request
+    - github_actions_runs

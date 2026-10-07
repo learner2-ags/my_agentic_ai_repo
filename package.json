@@ -1,0 +1,12 @@
+{
+  "name": "hpe-redfish-agentic-sdlc-lab",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "test:playwright": "playwright test",
+    "test:playwright:report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.55.0"
+  }
+}
